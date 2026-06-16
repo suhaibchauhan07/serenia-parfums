@@ -1,0 +1,25 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  background-color: #ffffff;
+  color: #1a1a1a;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Playfair Display', serif;
+}
+
+.luxury-button {
+  @apply px-6 py-2 bg-primary text-white hover:bg-secondary transition-colors duration-300 font-medium tracking-wider;
+}
+
+.luxury-card {
+  @apply bg-white border border-gray-100 shadow-sm hover:shadow-md transition-shadow duration-300;
+}
