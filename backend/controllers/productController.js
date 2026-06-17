@@ -1,37 +1,33 @@
 const supabase = require('../config/supabase');
 
-// Helper function to get category IDs for a product
-const getCategoryIdsForProduct = async (productId) => {
-  try {
-    const { data, error } = await supabase
-      .from('product_categories')
-      .select('category_id')
-      .eq('product_id', productId);
-    
-    if (error) throw error;
-    return data ? data.map(item => item.category_id) : [];
-  } catch (err) {
-    console.error(err);
-    return [];
-  }
-};
-
 exports.getProducts = async (req, res) => {
   try {
-    const { data, error } = await supabase
+    // First, get all products
+    const { data: products, error: productsError } = await supabase
       .from('products')
       .select('*')
       .order('created_at', { ascending: false });
 
-    if (error) throw error;
+    if (productsError) throw productsError;
 
-    // Add categoryIds to each product
-    const productsWithCategories = await Promise.all(
-      data.map(async (product) => ({
+    // Now get all product-category mappings
+    const { data: productCategories, error: pcError } = await supabase
+      .from('product_categories')
+      .select('product_id, category_id');
+
+    if (pcError) throw pcError;
+
+    // Map category IDs to products
+    const productsWithCategories = products.map(product => {
+      const categories = productCategories
+        .filter(pc => pc.product_id === product.id)
+        .map(pc => pc.category_id);
+      
+      return {
         ...product,
-        categoryIds: await getCategoryIdsForProduct(product.id)
-      }))
-    );
+        categoryIds: categories
+      };
+    });
 
     res.json(productsWithCategories);
   } catch (err) {
@@ -42,19 +38,26 @@ exports.getProducts = async (req, res) => {
 
 exports.getProductById = async (req, res) => {
   try {
-    const { data, error } = await supabase
+    const { data: product, error: productError } = await supabase
       .from('products')
       .select('*')
       .eq('id', req.params.id)
       .single();
 
-    if (error) throw error;
-    if (!data) return res.status(404).json({ message: 'Product not found' });
+    if (productError) throw productError;
+    if (!product) return res.status(404).json({ message: 'Product not found' });
 
-    // Add categoryIds to product
+    // Get category IDs for this product
+    const { data: productCategories, error: pcError } = await supabase
+      .from('product_categories')
+      .select('category_id')
+      .eq('product_id', product.id);
+
+    if (pcError) throw pcError;
+
     const productWithCategories = {
-      ...data,
-      categoryIds: await getCategoryIdsForProduct(data.id)
+      ...product,
+      categoryIds: productCategories ? productCategories.map(pc => pc.category_id) : []
     };
 
     res.json(productWithCategories);
@@ -68,7 +71,6 @@ exports.createProduct = async (req, res) => {
   try {
     const { categoryIds, ...productData } = req.body;
 
-    // Insert product
     const { data: product, error: productError } = await supabase
       .from('products')
       .insert([productData])
@@ -77,7 +79,6 @@ exports.createProduct = async (req, res) => {
 
     if (productError) throw productError;
 
-    // Insert category associations if provided
     if (categoryIds && categoryIds.length > 0) {
       const categoryInserts = categoryIds.map(catId => ({
         product_id: product.id,
@@ -91,7 +92,6 @@ exports.createProduct = async (req, res) => {
       if (categoryError) throw categoryError;
     }
 
-    // Return product with category IDs
     const productWithCategories = {
       ...product,
       categoryIds: categoryIds || []
@@ -108,7 +108,6 @@ exports.updateProduct = async (req, res) => {
   try {
     const { categoryIds, ...productData } = req.body;
 
-    // Update product
     const { data: product, error: productError } = await supabase
       .from('products')
       .update(productData)
@@ -118,25 +117,31 @@ exports.updateProduct = async (req, res) => {
 
     if (productError) throw productError;
 
-    // Update categories if provided
     if (categoryIds !== undefined) {
-      // Delete existing categories
+      // Delete old categories
       await supabase.from('product_categories').delete().eq('product_id', req.params.id);
-
-      // Insert new categories
+      
+      // Insert new categories if any
       if (categoryIds.length > 0) {
         const categoryInserts = categoryIds.map(catId => ({
           product_id: product.id,
           category_id: catId
         }));
-
         await supabase.from('product_categories').insert(categoryInserts);
       }
     }
 
+    // Get updated categories
+    const { data: productCategories, error: pcError } = await supabase
+      .from('product_categories')
+      .select('category_id')
+      .eq('product_id', product.id);
+
+    if (pcError) throw pcError;
+
     const productWithCategories = {
       ...product,
-      categoryIds: categoryIds || await getCategoryIdsForProduct(product.id)
+      categoryIds: productCategories ? productCategories.map(pc => pc.category_id) : []
     };
 
     res.json(productWithCategories);
