@@ -8,7 +8,13 @@ import api from '../../services/api';
 const Navbar = () => {
   const { user, logout } = useAuth();
   const { cartItems } = useCart();
-  const [categories, setCategories] = useState([]);
+  const [categories, setCategories] = useState([
+    { id: 'temp1', name: "Men's Perfumes" },
+    { id: 'temp2', name: "Women's Perfumes" },
+    { id: 'temp3', name: "Unisex Perfumes" },
+    { id: 'temp4', name: "Oud Collection" },
+    { id: 'temp5', name: "Luxury Collection" }
+  ]);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
@@ -18,10 +24,12 @@ const Navbar = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
+        console.log('Fetching categories...');
         const res = await api.get('/categories');
+        console.log('Categories API response:', res.data);
         setCategories(res.data);
       } catch (err) {
-        console.error(err);
+        console.error('Error fetching categories:', err);
       }
     };
     fetchCategories();
