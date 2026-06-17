@@ -26,7 +26,6 @@ const slides = [
 const Home = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [products, setProducts] = useState([]);
-  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -39,12 +38,9 @@ const Home = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [productsRes, categoriesRes] = await Promise.all([
-          api.get('/products'),
-          api.get('/categories')
-        ]);
-        setProducts(productsRes.data);
-        setCategories(categoriesRes.data);
+        const res = await api.get('/products');
+        console.log('Home page products:', res.data);
+        setProducts(res.data);
       } catch (err) {
         console.error(err);
       } finally {
@@ -54,7 +50,7 @@ const Home = () => {
     fetchData();
   }, []);
 
-  const featuredProducts = products.slice(0, 3);
+  const featuredProducts = products.slice(0, 3); // First 3 products!
 
   return (
     <div className="overflow-hidden">
@@ -137,11 +133,7 @@ const Home = () => {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
               {featuredProducts.map(product => (
-                <ProductCard 
-                key={product.id} 
-                product={product} 
-                categories={categories} 
-              />
+                <ProductCard key={product.id} product={product} />
               ))}
             </div>
           )}
