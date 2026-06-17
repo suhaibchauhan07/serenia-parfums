@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { ShoppingCart, User, LogOut, Search, ChevronDown, ChevronUp } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
@@ -11,7 +11,6 @@ const Navbar = () => {
   const [categories, setCategories] = useState([]);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const navigate = useNavigate();
-  const location = useLocation();
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -25,26 +24,8 @@ const Navbar = () => {
     fetchCategories();
   }, []);
 
-  const getCategoryName = (categoryId) => {
-    const category = categories.find(c => c.id === categoryId);
-    return category ? category.name : '';
-  };
-
-  const isActive = (path) => {
-    if (path === '/' && location.pathname === '/') return true;
-    if (path === '/products' && location.pathname === '/products' && !location.search.includes('category')) return true;
-    if (path === '/about' && location.pathname === '/about') return true;
-    if (path === '/contact' && location.pathname === '/contact') return true;
-    if (path === '/categories' && location.search.includes('category')) return true;
-    return false;
-  };
-
   const handleCategoryClick = (categoryId) => {
-    if (categoryId === 'all') {
-      navigate('/products');
-    } else {
-      navigate(`/products?category=${categoryId}`);
-    }
+    navigate(`/products?category=${categoryId}`);
     setDropdownOpen(false);
   };
 
@@ -59,20 +40,15 @@ const Navbar = () => {
 
           {/* Desktop Links */}
           <div className="hidden md:flex items-center space-x-8">
-            <Link 
-              to="/" 
-              className={`text-sm font-medium uppercase tracking-widest transition-colors ${isActive('/') ? 'text-secondary' : 'text-primary hover:text-secondary'}`}
-            >
-              Home
-            </Link>
-
+            <Link to="/" className="text-sm font-medium hover:text-secondary transition-colors uppercase tracking-widest">Home</Link>
+            
             {/* Categories Dropdown */}
             <div className="relative group">
               <button 
                 onClick={() => setDropdownOpen(!dropdownOpen)}
                 onMouseEnter={() => setDropdownOpen(true)}
                 onMouseLeave={() => setDropdownOpen(false)}
-                className={`text-sm font-medium uppercase tracking-widest transition-colors flex items-center ${isActive('/categories') ? 'text-secondary' : 'text-primary hover:text-secondary'}`}
+                className="text-sm font-medium hover:text-secondary transition-colors uppercase tracking-widest flex items-center"
               >
                 Categories
                 {dropdownOpen ? <ChevronUp size={14} className="ml-1" /> : <ChevronDown size={14} className="ml-1" />}
@@ -80,12 +56,12 @@ const Navbar = () => {
               
               {dropdownOpen && (
                 <div 
-                  className="absolute top-full left-0 mt-2 w-64 bg-white rounded-sm shadow-lg border border-gray-100 py-2 z-50"
+                  className="absolute top-full left-0 mt-2 w-48 bg-white rounded-sm shadow-lg border border-gray-100 py-2 z-50"
                   onMouseEnter={() => setDropdownOpen(true)}
                   onMouseLeave={() => setDropdownOpen(false)}
                 >
                   <button
-                    onClick={() => handleCategoryClick('all')}
+                    onClick={() => { navigate('/products'); setDropdownOpen(false); }}
                     className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-secondary transition-colors"
                   >
                     All Products
@@ -102,25 +78,10 @@ const Navbar = () => {
                 </div>
               )}
             </div>
-
-            <Link 
-              to="/products" 
-              className={`text-sm font-medium uppercase tracking-widest transition-colors ${isActive('/products') ? 'text-secondary' : 'text-primary hover:text-secondary'}`}
-            >
-              Products
-            </Link>
-            <Link 
-              to="/about" 
-              className={`text-sm font-medium uppercase tracking-widest transition-colors ${isActive('/about') ? 'text-secondary' : 'text-primary hover:text-secondary'}`}
-            >
-              About Us
-            </Link>
-            <Link 
-              to="/contact" 
-              className={`text-sm font-medium uppercase tracking-widest transition-colors ${isActive('/contact') ? 'text-secondary' : 'text-primary hover:text-secondary'}`}
-            >
-              Contact
-            </Link>
+            
+            <Link to="/products" className="text-sm font-medium hover:text-secondary transition-colors uppercase tracking-widest">Products</Link>
+            <Link to="/about" className="text-sm font-medium hover:text-secondary transition-colors uppercase tracking-widest">About Us</Link>
+            <Link to="/contact" className="text-sm font-medium hover:text-secondary transition-colors uppercase tracking-widest">Contact</Link>
           </div>
 
           {/* Icons */}
