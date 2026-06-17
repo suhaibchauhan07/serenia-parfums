@@ -7,11 +7,24 @@ const getCategories = async (req, res) => {
     const { data, error } = await supabase
       .from('categories')
       .select('*')
-      .eq('isActive', true);
+      .eq('isActive', true)
+      .order('name');
     
     if (error) throw error;
-    res.json(data);
+    
+    // Remove duplicate categories (keep first occurrence by name)
+    const uniqueCategories = [];
+    const seenNames = new Set();
+    for (const cat of data) {
+      if (!seenNames.has(cat.name)) {
+        seenNames.add(cat.name);
+        uniqueCategories.push(cat);
+      }
+    }
+    
+    res.json(uniqueCategories);
   } catch (err) {
+    console.error('Error in getCategories:', err);
     res.status(500).json({ message: err.message });
   }
 };

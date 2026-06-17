@@ -2,6 +2,8 @@ const supabase = require('../config/supabase');
 
 exports.getProducts = async (req, res) => {
   try {
+    console.log('Fetching products with query:', req.query);
+    
     // Get all categories first
     const { data: categories, error: categoriesError } = await supabase
       .from('categories')
@@ -9,6 +11,7 @@ exports.getProducts = async (req, res) => {
       .eq('isActive', true);
     
     if (categoriesError) throw categoriesError;
+    console.log('Fetched categories:', categories?.length);
     
     // First, get all products
     let productsQuery = supabase
@@ -17,7 +20,8 @@ exports.getProducts = async (req, res) => {
       .order('created_at', { ascending: false });
 
     // If category filter is provided
-    if (req.query.category) {
+    if (req.query.category && req.query.category !== 'undefined' && req.query.category !== 'null') {
+      console.log('Filtering by category:', req.query.category);
       // Get product IDs for this category
       const { data: productIds, error: pcError } = await supabase
         .from('product_categories')
@@ -25,12 +29,14 @@ exports.getProducts = async (req, res) => {
         .eq('category_id', req.query.category);
       
       if (pcError) throw pcError;
+      console.log('Found product IDs for category:', productIds?.length);
       
-      const ids = productIds.map(pc => pc.product_id);
+      const ids = productIds ? productIds.map(pc => pc.product_id) : [];
       if (ids.length > 0) {
         productsQuery = productsQuery.in('id', ids);
       } else {
         // No products in category
+        console.log('No products found for category, returning empty array');
         return res.json([]);
       }
     }
@@ -38,6 +44,7 @@ exports.getProducts = async (req, res) => {
     const { data: products, error: productsError } = await productsQuery;
 
     if (productsError) throw productsError;
+    console.log('Fetched products:', products?.length);
 
     // Now get all product-category mappings
     const { data: productCategories, error: pcError } = await supabase
@@ -45,14 +52,17 @@ exports.getProducts = async (req, res) => {
       .select('product_id, category_id');
 
     if (pcError) throw pcError;
+    console.log('Fetched product categories:', productCategories?.length);
 
     // Map category IDs to products (with full category info)
     const productsWithCategories = products.map(product => {
       const productCatIds = productCategories
-        .filter(pc => pc.product_id === product.id)
-        .map(pc => pc.category_id);
+        ? productCategories.filter(pc => pc.product_id === product.id).map(pc => pc.category_id)
+        : [];
       
-      const productCats = categories.filter(cat => productCatIds.includes(cat.id));
+      const productCats = categories
+        ? categories.filter(cat => productCatIds.includes(cat.id))
+        : [];
       
       return {
         ...product,
@@ -61,10 +71,11 @@ exports.getProducts = async (req, res) => {
       };
     });
 
+    console.log('Returning products with categories:', productsWithCategories.length);
     res.json(productsWithCategories);
   } catch (err) {
-    console.error(err.message);
-    res.status(500).send('Server Error');
+    console.error('Error in getProducts:', err);
+    res.status(500).send('Server Error: ' + err.message);
   }
 };
 
