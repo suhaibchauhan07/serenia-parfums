@@ -14,8 +14,9 @@ const Products = () => {
     const fetchData = async () => {
       try {
         // Fetch categories to get selected category name
+        const params = categoryId ? { category: categoryId } : {};
         const [productsRes, categoriesRes] = await Promise.all([
-          api.get('/products', { params: { category: categoryId } }),
+          api.get('/products', { params }),
           api.get('/categories')
         ]);
         
