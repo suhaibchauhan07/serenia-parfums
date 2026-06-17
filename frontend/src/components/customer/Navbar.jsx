@@ -1,49 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useNavigate, useLocation, useSearchParams } from 'react-router-dom';
-import { ShoppingCart, User, LogOut, Search, ChevronDown, ChevronUp } from 'lucide-react';
+import React from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { ShoppingCart, User, LogOut, Search } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
-import api from '../../services/api';
 
 const Navbar = () => {
   const { user, logout } = useAuth();
   const { cartItems } = useCart();
-  const [categories, setCategories] = useState([
-    { id: 'temp1', name: "Men's Perfumes" },
-    { id: 'temp2', name: "Women's Perfumes" },
-    { id: 'temp3', name: "Unisex Perfumes" },
-    { id: 'temp4', name: "Oud Collection" },
-    { id: 'temp5', name: "Luxury Collection" }
-  ]);
-  const [dropdownOpen, setDropdownOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
-  const [searchParams] = useSearchParams();
-  const categoryId = searchParams.get('category');
 
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        console.log('Fetching categories...');
-        const res = await api.get('/categories');
-        console.log('Categories API response:', res.data);
-        setCategories(res.data);
-      } catch (err) {
-        console.error('Error fetching categories:', err);
-      }
-    };
-    fetchCategories();
-  }, []);
-
-  const handleCategoryClick = (categoryId) => {
-    navigate(`/products?category=${categoryId}`);
-    setDropdownOpen(false);
-  };
-
-  const isActive = (path, checkCategory = false) => {
-    if (checkCategory) {
-      return categoryId !== null || location.pathname === path;
-    }
+  const isActive = (path) => {
     return location.pathname === path;
   };
 
@@ -65,46 +32,9 @@ const Navbar = () => {
               Home
             </Link>
             
-            {/* Categories Dropdown */}
-            <div className="relative group">
-              <button 
-                onClick={() => setDropdownOpen(!dropdownOpen)}
-                onMouseEnter={() => setDropdownOpen(true)}
-                onMouseLeave={() => setDropdownOpen(false)}
-                className={`text-sm font-medium transition-colors uppercase tracking-widest flex items-center ${isActive('/products', true) ? 'text-secondary' : 'hover:text-secondary'}`}
-              >
-                Categories
-                {dropdownOpen ? <ChevronUp size={14} className="ml-1" /> : <ChevronDown size={14} className="ml-1" />}
-              </button>
-              
-              {dropdownOpen && (
-                <div 
-                  className="absolute top-full left-0 mt-2 w-48 bg-white rounded-sm shadow-lg border border-gray-100 py-2 z-50"
-                  onMouseEnter={() => setDropdownOpen(true)}
-                  onMouseLeave={() => setDropdownOpen(false)}
-                >
-                  <button
-                    onClick={() => { navigate('/products'); setDropdownOpen(false); }}
-                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-secondary transition-colors"
-                  >
-                    All Products
-                  </button>
-                  {categories.map((category) => (
-                    <button
-                      key={category.id}
-                      onClick={() => handleCategoryClick(category.id)}
-                      className={`block w-full text-left px-4 py-2 text-sm transition-colors ${categoryId === category.id ? 'text-secondary font-bold bg-gray-50' : 'text-gray-700 hover:bg-gray-50 hover:text-secondary'}`}
-                    >
-                      {category.name}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-            
             <Link 
               to="/products" 
-              className={`text-sm font-medium transition-colors uppercase tracking-widest ${isActive('/products') && !categoryId ? 'text-secondary' : 'hover:text-secondary'}`}
+              className={`text-sm font-medium transition-colors uppercase tracking-widest ${isActive('/products') ? 'text-secondary' : 'hover:text-secondary'}`}
             >
               Products
             </Link>

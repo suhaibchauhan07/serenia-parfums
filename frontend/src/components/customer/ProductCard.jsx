@@ -6,7 +6,6 @@ import { formatCurrency } from '../../utils/currency';
 
 const ProductCard = ({ product }) => {
   const { addToCart } = useCart();
-  const mainCategory = product.categories && product.categories.length > 0 ? product.categories[0] : null;
 
   return (
     <div className="luxury-card group overflow-hidden">
@@ -35,9 +34,6 @@ const ProductCard = ({ product }) => {
       </div>
       
       <div className="p-6">
-        {mainCategory && (
-          <div className="text-xs text-secondary font-bold uppercase tracking-widest mb-1">{mainCategory.name}</div>
-        )}
         <div className="text-xs text-gray-500 uppercase tracking-widest mb-2">{product.brand}</div>
         <h3 className="text-lg font-serif font-bold mb-2 group-hover:text-secondary transition-colors line-clamp-1">{product.name}</h3>
         <p className="text-gray-500 text-sm mb-4 line-clamp-2">{product.description}</p>

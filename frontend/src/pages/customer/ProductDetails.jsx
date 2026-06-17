@@ -48,15 +48,6 @@ const ProductDetails = () => {
 
           {/* Info */}
           <div className="flex flex-col justify-center">
-            {product.categories && product.categories.length > 0 && (
-              <div className="flex flex-wrap gap-2 mb-4">
-                {product.categories.map(category => (
-                  <span key={category.id} className="text-secondary font-bold uppercase tracking-[0.3em] text-xs">
-                    {category.name}
-                  </span>
-                ))}
-              </div>
-            )}
             <span className="text-gray-500 font-bold uppercase tracking-[0.3em] text-sm mb-4">{product.brand}</span>
             <h1 className="text-4xl md:text-5xl font-serif font-bold mb-6">{product.name}</h1>
             <p className="text-2xl md:text-3xl font-light mb-8">{formatCurrency(product.price)}</p>
