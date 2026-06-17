@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { ShoppingCart, ArrowLeft, ShieldCheck, Truck, RefreshCw } from 'lucide-react';
 import api from '../../services/api';
 import { useCart } from '../../context/CartContext';
+import { formatCurrency } from '../../utils/currency';
 
 const ProductDetails = () => {
   const { id } = useParams();
@@ -35,21 +36,21 @@ const ProductDetails = () => {
           <ArrowLeft size={16} className="mr-2" /> Back to Collection
         </Link>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
           {/* Image */}
-          <div className="bg-gray-50 rounded-sm overflow-hidden aspect-[4/5]">
+          <div className="bg-gray-50 rounded-sm overflow-hidden max-w-md mx-auto w-full">
             <img 
               src={product.image_url || 'https://via.placeholder.com/600x750'} 
               alt={product.name} 
-              className="w-full h-full object-cover"
+              className="w-full h-auto max-h-[500px] object-contain"
             />
           </div>
 
           {/* Info */}
           <div className="flex flex-col justify-center">
             <span className="text-secondary font-bold uppercase tracking-[0.3em] text-sm mb-4">{product.brand}</span>
-            <h1 className="text-5xl font-serif font-bold mb-6">{product.name}</h1>
-            <p className="text-3xl font-light mb-8">${product.price}</p>
+            <h1 className="text-4xl md:text-5xl font-serif font-bold mb-6">{product.name}</h1>
+            <p className="text-2xl md:text-3xl font-light mb-8">{formatCurrency(product.price)}</p>
             
             <div className="prose prose-sm text-gray-500 mb-10 leading-relaxed">
               <p>{product.description}</p>
@@ -75,7 +76,7 @@ const ProductDetails = () => {
                 onClick={() => addToCart(product.id, quantity)}
                 className="luxury-button flex-grow flex items-center justify-center py-4"
               >
-                <ShoppingCart size={20} className="mr-2" /> ADD TO BAG
+                <ShoppingCart size={20} className="mr-2" /> ADD TO CART
               </button>
             </div>
 

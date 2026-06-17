@@ -1,7 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Trash2, Plus, Minus, ShoppingBag, ArrowRight } from 'lucide-react';
+import { Trash2, Plus, Minus, ShoppingCart, ArrowRight } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
+import { formatCurrency } from '../../utils/currency';
 
 const Cart = () => {
   const { cartItems, removeFromCart, updateQuantity, cartTotal, loading } = useCart();
@@ -18,9 +19,9 @@ const Cart = () => {
     return (
       <div className="container mx-auto px-6 py-24 text-center">
         <div className="bg-accent w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6">
-          <ShoppingBag size={40} className="text-secondary" />
+          <ShoppingCart size={40} className="text-secondary" />
         </div>
-        <h2 className="text-3xl font-serif font-bold mb-4">Your Bag is Empty</h2>
+        <h2 className="text-3xl font-serif font-bold mb-4">Your Cart is Empty</h2>
         <p className="text-gray-500 mb-8 max-w-md mx-auto">It looks like you haven't added any fragrances to your collection yet.</p>
         <Link to="/products" className="luxury-button inline-block">
           EXPLORE COLLECTION
@@ -32,7 +33,7 @@ const Cart = () => {
   return (
     <div className="bg-gray-50 min-h-screen py-16">
       <div className="container mx-auto px-6">
-        <h1 className="text-4xl font-serif font-bold mb-12">Shopping Bag</h1>
+        <h1 className="text-4xl font-serif font-bold mb-12">Shopping Cart</h1>
 
         <div className="flex flex-col lg:flex-row gap-12">
           {/* Cart Items */}
@@ -50,7 +51,7 @@ const Cart = () => {
                 <div className="flex-grow text-center sm:text-left">
                   <div className="text-xs text-secondary font-bold uppercase tracking-widest mb-1">{item.products.brand}</div>
                   <h3 className="text-lg font-serif font-bold mb-1">{item.products.name}</h3>
-                  <p className="text-gray-400 text-sm mb-2">${item.products.price}</p>
+                  <p className="text-gray-400 text-sm mb-2">{formatCurrency(item.products.price)}</p>
                 </div>
 
                 <div className="flex items-center space-x-4">
@@ -79,7 +80,7 @@ const Cart = () => {
                 </div>
 
                 <div className="w-24 text-right font-bold">
-                  ${(item.products.price * item.quantity).toFixed(2)}
+                  {formatCurrency(item.products.price * item.quantity)}
                 </div>
               </div>
             ))}
@@ -93,7 +94,7 @@ const Cart = () => {
               <div className="space-y-4 mb-8">
                 <div className="flex justify-between text-gray-600">
                   <span>Subtotal</span>
-                  <span>${cartTotal.toFixed(2)}</span>
+                  <span>{formatCurrency(cartTotal)}</span>
                 </div>
                 <div className="flex justify-between text-gray-600">
                   <span>Shipping</span>
@@ -105,7 +106,7 @@ const Cart = () => {
                 </div>
                 <div className="pt-4 border-t border-gray-100 flex justify-between text-xl font-bold">
                   <span>Total</span>
-                  <span>${cartTotal.toFixed(2)}</span>
+                  <span>{formatCurrency(cartTotal)}</span>
                 </div>
               </div>
 

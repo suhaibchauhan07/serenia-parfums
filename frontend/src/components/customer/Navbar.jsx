@@ -1,13 +1,33 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ShoppingCart, User, LogOut, Search } from 'lucide-react';
+import { ShoppingCart, User, LogOut, Search, ChevronDown, ChevronUp } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
+import api from '../../services/api';
 
 const Navbar = () => {
   const { user, logout } = useAuth();
   const { cartItems } = useCart();
+  const [categories, setCategories] = useState([]);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const res = await api.get('/categories');
+        setCategories(res.data);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    fetchCategories();
+  }, []);
+
+  const handleCategoryClick = (categoryId) => {
+    navigate(`/products?category=${categoryId}`);
+    setDropdownOpen(false);
+  };
 
   return (
     <nav className="bg-white shadow-sm sticky top-0 z-50">
@@ -21,6 +41,44 @@ const Navbar = () => {
           {/* Desktop Links */}
           <div className="hidden md:flex items-center space-x-8">
             <Link to="/" className="text-sm font-medium hover:text-secondary transition-colors uppercase tracking-widest">Home</Link>
+            
+            {/* Categories Dropdown */}
+            <div className="relative group">
+              <button 
+                onClick={() => setDropdownOpen(!dropdownOpen)}
+                onMouseEnter={() => setDropdownOpen(true)}
+                onMouseLeave={() => setDropdownOpen(false)}
+                className="text-sm font-medium hover:text-secondary transition-colors uppercase tracking-widest flex items-center"
+              >
+                Categories
+                {dropdownOpen ? <ChevronUp size={14} className="ml-1" /> : <ChevronDown size={14} className="ml-1" />}
+              </button>
+              
+              {dropdownOpen && (
+                <div 
+                  className="absolute top-full left-0 mt-2 w-48 bg-white rounded-sm shadow-lg border border-gray-100 py-2 z-50"
+                  onMouseEnter={() => setDropdownOpen(true)}
+                  onMouseLeave={() => setDropdownOpen(false)}
+                >
+                  <button
+                    onClick={() => { navigate('/products'); setDropdownOpen(false); }}
+                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-secondary transition-colors"
+                  >
+                    All Products
+                  </button>
+                  {categories.map((category) => (
+                    <button
+                      key={category.id}
+                      onClick={() => handleCategoryClick(category.id)}
+                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-secondary transition-colors"
+                    >
+                      {category.name}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+            
             <Link to="/products" className="text-sm font-medium hover:text-secondary transition-colors uppercase tracking-widest">Products</Link>
             <Link to="/about" className="text-sm font-medium hover:text-secondary transition-colors uppercase tracking-widest">About Us</Link>
             <Link to="/contact" className="text-sm font-medium hover:text-secondary transition-colors uppercase tracking-widest">Contact</Link>
@@ -28,7 +86,7 @@ const Navbar = () => {
 
           {/* Icons */}
           <div className="flex items-center space-x-5">
-            <button className="text-gray-600 hover:text-primary transition-colors">
+            <button className="text-gray-600 hover:text-primary transition-colors" onClick={() => navigate('/products')}>
               <Search size={20} />
             </button>
             

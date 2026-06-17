@@ -68,8 +68,8 @@ const AdminLogin = () => {
                 <input 
                   type="password" 
                   required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  value={password} 
+                  onChange={(e) => setPassword(e.target.value)} 
                   className="w-full border-b border-gray-200 py-3 pl-10 focus:outline-none focus:border-secondary transition-colors"
                   placeholder="••••••••"
                 />

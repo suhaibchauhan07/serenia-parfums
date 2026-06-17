@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
+import ScrollToTop from './components/ScrollToTop';
 
 // Customer Pages
 import Home from './pages/customer/Home';
@@ -20,6 +21,7 @@ import AdminDashboard from './pages/admin/Dashboard';
 import AdminProducts from './pages/admin/Products';
 import AdminAddProduct from './pages/admin/AddProduct';
 import AdminEditProduct from './pages/admin/EditProduct';
+import AdminCategories from './pages/admin/Categories';
 
 // Layouts
 import CustomerLayout from './layouts/CustomerLayout';
@@ -40,6 +42,7 @@ function App() {
     <AuthProvider>
       <CartProvider>
         <Router>
+          <ScrollToTop />
           <Routes>
             {/* Customer Routes */}
             <Route element={<CustomerLayout />}>
@@ -61,6 +64,7 @@ function App() {
               <Route path="products" element={<AdminProducts />} />
               <Route path="add-product" element={<AdminAddProduct />} />
               <Route path="edit-product/:id" element={<AdminEditProduct />} />
+              <Route path="categories" element={<AdminCategories />} />
             </Route>
 
             <Route path="*" element={<Navigate to="/" />} />

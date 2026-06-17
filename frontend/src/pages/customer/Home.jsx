@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import api from '../../services/api';
@@ -9,23 +9,25 @@ const slides = [
   {
     image: 'https://images.unsplash.com/photo-1541643600914-78b084683601?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80',
     title: 'The Essence of Elegance',
-    subtitle: 'Discover our premium summer collection'
+    subtitle: 'Discover Serenia Premium Collection'
   },
   {
     image: 'https://images.unsplash.com/photo-1594035910387-fea47794261f?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80',
     title: 'Timeless Fragrance',
-    subtitle: 'A scent for every moment'
+    subtitle: 'A Scent for Every Moment'
   },
   {
     image: 'https://images.unsplash.com/photo-1523293182086-7651a899d37f?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80',
     title: 'Signature Scents',
-    subtitle: 'Define your presence'
+    subtitle: 'Define Your Presence'
   }
 ];
 
 const Home = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [featuredProducts, setFeaturedProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -35,15 +37,19 @@ const Home = () => {
   }, []);
 
   useEffect(() => {
-    const fetchFeatured = async () => {
+    const fetchData = async () => {
       try {
-        const res = await api.get('/products');
-        setFeaturedProducts(res.data.slice(0, 4));
+        const [productsRes, categoriesRes] = await Promise.all([
+          api.get('/products'),
+          api.get('/categories')
+        ]);
+        setFeaturedProducts(productsRes.data.slice(0, 4));
+        setCategories(categoriesRes.data);
       } catch (err) {
         console.error(err);
       }
     };
-    fetchFeatured();
+    fetchData();
   }, []);
 
   return (
@@ -110,6 +116,43 @@ const Home = () => {
           <ChevronRight size={40} />
         </button>
       </section>
+
+      {/* Categories Section */}
+      {categories.length > 0 && (
+        <section className="py-24 bg-gray-50">
+          <div className="container mx-auto px-6">
+            <div className="text-center mb-16">
+              <span className="text-secondary font-medium tracking-widest uppercase text-sm">Explore by Category</span>
+              <h2 className="text-4xl font-serif font-bold mt-2">Our Collections</h2>
+              <div className="w-24 h-1 bg-secondary mx-auto mt-6"></div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {categories.map((category) => (
+                <motion.div
+                  key={category.id}
+                  whileHover={{ y: -8 }}
+                  className="group cursor-pointer"
+                  onClick={() => navigate(`/products?category=${category.id}`)}
+                >
+                  <div className="relative overflow-hidden rounded-sm shadow-lg aspect-[4/3]">
+                    <img 
+                      src={category.image} 
+                      alt={category.name} 
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent"></div>
+                    <div className="absolute bottom-0 left-0 right-0 p-8">
+                      <h3 className="text-2xl font-serif font-bold text-white mb-2">{category.name}</h3>
+                      <p className="text-gray-200 text-sm">{category.description}</p>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Featured Products */}
       <section className="py-24 bg-white">

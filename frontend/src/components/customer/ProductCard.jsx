@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { ShoppingCart, Eye } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
+import { formatCurrency } from '../../utils/currency';
 
 const ProductCard = ({ product }) => {
   const { addToCart } = useCart();
@@ -37,12 +38,12 @@ const ProductCard = ({ product }) => {
         <h3 className="text-lg font-serif font-bold mb-2 group-hover:text-secondary transition-colors line-clamp-1">{product.name}</h3>
         <p className="text-gray-500 text-sm mb-4 line-clamp-2">{product.description}</p>
         <div className="flex justify-between items-center">
-          <span className="text-xl font-bold">${product.price}</span>
+          <span className="text-xl font-bold">{formatCurrency(product.price)}</span>
           <button 
             onClick={() => addToCart(product.id)}
             className="text-xs font-bold uppercase tracking-tighter border-b border-primary hover:text-secondary hover:border-secondary transition-all"
           >
-            Add to Bag
+            Add to Cart
           </button>
         </div>
       </div>

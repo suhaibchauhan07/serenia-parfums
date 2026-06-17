@@ -1,9 +1,32 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { User, Mail, Shield, Calendar, Package, Heart, Settings } from 'lucide-react';
+import { User, Mail, Shield, Calendar, Package, Heart, Settings, X, CheckCircle, UserPlus, Check } from 'lucide-react';
+import api from '../../services/api';
 
 const Profile = () => {
-  const { user } = useAuth();
+  const { user, updateUser } = useAuth();
+  const [isEditing, setIsEditing] = useState(false);
+  const [editForm, setEditForm] = useState({ name: user.name, email: user.email });
+  const [success, setSuccess] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleSave = async () => {
+    setLoading(true);
+    setError('');
+    setSuccess('');
+    try {
+      const res = await api.put('/auth/me', editForm);
+      updateUser(res.data);
+      setSuccess('Profile updated successfully!');
+      setIsEditing(false);
+      setTimeout(() => setSuccess(''), 3000);
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to update profile');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   if (!user) return null;
 
@@ -11,6 +34,7 @@ const Profile = () => {
     <div className="bg-gray-50 min-h-screen py-16">
       <div className="container mx-auto px-6">
         <div className="max-w-4xl mx-auto">
+          {/* Header Card */}
           <div className="bg-white rounded-sm shadow-sm overflow-hidden mb-8">
             <div className="bg-primary h-32 relative">
               <div className="absolute -bottom-12 left-8 border-4 border-white rounded-full overflow-hidden bg-white">
@@ -23,15 +47,70 @@ const Profile = () => {
             </div>
             <div className="pt-16 pb-8 px-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
               <div>
-                <h1 className="text-3xl font-serif font-bold">{user.name}</h1>
-                <p className="text-gray-400 flex items-center mt-1">
-                  <Mail size={14} className="mr-2" /> {user.email}
-                </p>
+                {isEditing ? (
+                  <div className="space-y-4 w-full max-w-md">
+                    <input 
+                      type="text" 
+                      value={editForm.name}
+                      onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                      className="w-full border-b border-gray-200 py-2 focus:outline-none focus:border-secondary text-3xl font-serif font-bold"
+                    />
+                    <input 
+                      type="email" 
+                      value={editForm.email}
+                      onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
+                      className="w-full border-b border-gray-200 py-2 focus:outline-none focus:border-secondary text-gray-600"
+                    />
+                  </div>
+                ) : (
+                  <>
+                    <h1 className="text-3xl font-serif font-bold">{user.name}</h1>
+                    <p className="text-gray-400 flex items-center mt-1">
+                      <Mail size={14} className="mr-2" /> {user.email}
+                    </p>
+                  </>
+                )}
               </div>
-              <div className="flex space-x-4">
-                <button className="luxury-button py-2 px-4 text-xs">EDIT PROFILE</button>
-              </div>
+              { isEditing ? (
+                <div className="flex space-x-4">
+                  <button 
+                    onClick={() => { setIsEditing(false); setEditForm({ name: user.name, email: user.email }); }}
+                    className="border border-gray-300 py-2 px-4 text-xs hover:bg-gray-100"
+                  >
+                    Cancel
+                  </button>
+                  <button 
+                    onClick={handleSave}
+                    disabled={loading}
+                    className="luxury-button py-2 px-4 text-xs flex items-center"
+                  >
+                    {loading ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-t border-b border-white mr-2"></div>
+                        Saving...
+                      </>
+                    ) : (
+                      <> Save </>
+                    )}
+                  </button>
+                </div>
+              ) : (
+                <button 
+                onClick={() => setIsEditing(true)}
+                className="luxury-button py-2 px-4 text-xs">EDIT PROFILE</button>
+              )}
             </div>
+            {success && (
+              <div className="px-8 pb-6 text-green-600 flex items-center">
+                <CheckCircle size={16} className="mr-2" />
+                {success}
+              </div>
+            )}
+            {error && (
+              <div className="px-8 pb-6 text-red-600">
+                {error}
+              </div>
+            )}
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">

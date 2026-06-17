@@ -18,7 +18,7 @@ const About = () => {
             <div className="space-y-8">
               <h2 className="text-4xl font-serif font-bold">A Legacy of Luxury</h2>
               <p className="text-gray-600 leading-relaxed text-lg">
-                Founded in 1920 in the heart of Grasse, France, Elixir Parfum has spent over a century perfecting the art of fine fragrance. What began as a small family atelier has grown into a world-renowned house of luxury, known for our uncompromising commitment to quality and artistic expression.
+                Founded in 1920 in the heart of Grasse, France, Serenia Parfums has spent over a century perfecting the art of fine fragrance. What began as a small family atelier has grown into a world-renowned house of luxury, known for our uncompromising commitment to quality and artistic expression.
               </p>
               <p className="text-gray-600 leading-relaxed text-lg">
                 We believe that a fragrance is more than just a scent; it is an invisible accessory, a memory captured in a bottle, and a statement of identity.
@@ -48,7 +48,7 @@ const About = () => {
       {/* Philosophy */}
       <section className="py-24 bg-accent">
         <div className="container mx-auto px-6 text-center">
-          <h2 className="text-4xl font-serif font-bold mb-16">The Elixir Philosophy</h2>
+          <h2 className="text-4xl font-serif font-bold mb-16">The Serenia Philosophy</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
             <div className="p-8 bg-white shadow-sm rounded-sm">
               <h3 className="text-xl font-serif font-bold mb-4">Purity</h3>
