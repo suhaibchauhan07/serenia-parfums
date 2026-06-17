@@ -2,11 +2,40 @@ const supabase = require('../config/supabase');
 
 exports.getProducts = async (req, res) => {
   try {
+    // Get all categories first
+    const { data: categories, error: categoriesError } = await supabase
+      .from('categories')
+      .select('*')
+      .eq('isActive', true);
+    
+    if (categoriesError) throw categoriesError;
+    
     // First, get all products
-    const { data: products, error: productsError } = await supabase
+    let productsQuery = supabase
       .from('products')
       .select('*')
       .order('created_at', { ascending: false });
+
+    // If category filter is provided
+    if (req.query.category) {
+      // Get product IDs for this category
+      const { data: productIds, error: pcError } = await supabase
+        .from('product_categories')
+        .select('product_id')
+        .eq('category_id', req.query.category);
+      
+      if (pcError) throw pcError;
+      
+      const ids = productIds.map(pc => pc.product_id);
+      if (ids.length > 0) {
+        productsQuery = productsQuery.in('id', ids);
+      } else {
+        // No products in category
+        return res.json([]);
+      }
+    }
+
+    const { data: products, error: productsError } = await productsQuery;
 
     if (productsError) throw productsError;
 
@@ -17,15 +46,18 @@ exports.getProducts = async (req, res) => {
 
     if (pcError) throw pcError;
 
-    // Map category IDs to products
+    // Map category IDs to products (with full category info)
     const productsWithCategories = products.map(product => {
-      const categories = productCategories
+      const productCatIds = productCategories
         .filter(pc => pc.product_id === product.id)
         .map(pc => pc.category_id);
       
+      const productCats = categories.filter(cat => productCatIds.includes(cat.id));
+      
       return {
         ...product,
-        categoryIds: categories
+        categoryIds: productCatIds,
+        categories: productCats
       };
     });
 
@@ -47,17 +79,31 @@ exports.getProductById = async (req, res) => {
     if (productError) throw productError;
     if (!product) return res.status(404).json({ message: 'Product not found' });
 
-    // Get category IDs for this product
+    // Get category IDs and names for this product
     const { data: productCategories, error: pcError } = await supabase
       .from('product_categories')
       .select('category_id')
       .eq('product_id', product.id);
 
     if (pcError) throw pcError;
+    
+    // Fetch full category details
+    const categoryIds = productCategories ? productCategories.map(pc => pc.category_id) : [];
+    let categories = [];
+    if (categoryIds.length > 0) {
+      const { data: cats, error: catsError } = await supabase
+        .from('categories')
+        .select('*')
+        .in('id', categoryIds);
+      
+      if (catsError) throw catsError;
+      categories = cats;
+    }
 
     const productWithCategories = {
       ...product,
-      categoryIds: productCategories ? productCategories.map(pc => pc.category_id) : []
+      categoryIds: categoryIds,
+      categories: categories
     };
 
     res.json(productWithCategories);

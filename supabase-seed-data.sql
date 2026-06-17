@@ -60,6 +60,6 @@ SELECT
   pcm.product_id,
   cm.id
 FROM product_category_map pcm,
-     unnest(pcm.category_slugs) AS slug,
+     unnest(pcm.category_slugs) AS cat_slug,
      category_map cm
-WHERE cm.slug = slug;
+WHERE cm.slug = cat_slug;

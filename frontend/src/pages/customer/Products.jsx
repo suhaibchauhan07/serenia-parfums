@@ -1,33 +1,48 @@
 import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import api from '../../services/api';
 import ProductCard from '../../components/customer/ProductCard';
 
 const Products = () => {
   const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchParams] = useSearchParams();
+  const categoryId = searchParams.get('category');
 
   useEffect(() => {
-    const fetchProducts = async () => {
+    const fetchData = async () => {
       try {
-        const res = await api.get('/products');
-        console.log('Products from API:', res.data); // For debugging!
-        setProducts(res.data);
+        // Fetch categories to get selected category name
+        const [productsRes, categoriesRes] = await Promise.all([
+          api.get('/products', { params: { category: categoryId } }),
+          api.get('/categories')
+        ]);
+        
+        setProducts(productsRes.data);
+        setCategories(categoriesRes.data);
       } catch (err) {
-        console.error('Error fetching products:', err);
+        console.error('Error fetching data:', err);
       } finally {
         setLoading(false);
       }
     };
-    fetchProducts();
-  }, []);
+    fetchData();
+  }, [categoryId]);
+
+  const selectedCategory = categoryId ? categories.find(c => c.id === categoryId) : null;
 
   return (
     <div className="bg-gray-50 min-h-screen py-12">
       <div className="container mx-auto px-6">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-serif font-bold mb-4">Our Collection</h1>
+          <h1 className="text-4xl font-serif font-bold mb-4">
+            {selectedCategory ? selectedCategory.name : 'Our Collection'}
+          </h1>
           <p className="text-gray-500 max-w-2xl mx-auto">
-            Explore our range of premium fragrances, crafted with the finest ingredients.
+            {selectedCategory 
+              ? selectedCategory.description 
+              : 'Explore our range of premium fragrances, crafted with the finest ingredients.'}
           </p>
         </div>
 
@@ -37,9 +52,15 @@ const Products = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {products.map(product => (
-              <ProductCard key={product.id} product={product} />
-            ))}
+            {products.length > 0 ? (
+              products.map(product => (
+                <ProductCard key={product.id} product={product} />
+              ))
+            ) : (
+              <div className="col-span-full text-center py-20">
+                <p className="text-gray-500">No products found in this category.</p>
+              </div>
+            )}
           </div>
         )}
       </div>
