@@ -8,23 +8,38 @@ import { formatCurrency } from '../../utils/currency';
 const ProductDetails = () => {
   const { id } = useParams();
   const [product, setProduct] = useState(null);
+  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
   const { addToCart } = useCart();
 
   useEffect(() => {
-    const fetchProduct = async () => {
+    const fetchData = async () => {
       try {
-        const res = await api.get(`/products/${id}`);
-        setProduct(res.data);
+        const [productRes, categoriesRes] = await Promise.all([
+          api.get(`/products/${id}`),
+          api.get('/categories')
+        ]);
+        setProduct(productRes.data);
+        setCategories(categoriesRes.data);
       } catch (err) {
         console.error(err);
       } finally {
         setLoading(false);
       }
     };
-    fetchProduct();
+    fetchData();
   }, [id]);
+
+  const getCategoryNames = () => {
+    if (!product?.categoryIds || categories.length === 0) return [];
+    return product.categoryIds
+      .map(categoryId => categories.find(cat => cat.id === categoryId))
+      .filter(Boolean)
+      .map(cat => cat.name);
+  };
+
+  const categoryNames = getCategoryNames();
 
   if (loading) return <div className="text-center py-20">Loading...</div>;
   if (!product) return <div className="text-center py-20">Product not found.</div>;
@@ -48,6 +63,11 @@ const ProductDetails = () => {
 
           {/* Info */}
           <div className="flex flex-col justify-center">
+            {categoryNames.length > 0 && (
+              <div className="text-xs text-gray-500 font-semibold uppercase tracking-widest mb-2">
+                {categoryNames.join(' • ')}
+              </div>
+            )}
             <span className="text-secondary font-bold uppercase tracking-[0.3em] text-sm mb-4">{product.brand}</span>
             <h1 className="text-4xl md:text-5xl font-serif font-bold mb-6">{product.name}</h1>
             <p className="text-2xl md:text-3xl font-light mb-8">{formatCurrency(product.price)}</p>

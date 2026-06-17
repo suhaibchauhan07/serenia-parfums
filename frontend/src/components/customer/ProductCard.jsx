@@ -4,8 +4,19 @@ import { ShoppingCart, Eye } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
 import { formatCurrency } from '../../utils/currency';
 
-const ProductCard = ({ product }) => {
+const ProductCard = ({ product, categories = [] }) => {
   const { addToCart } = useCart();
+
+  const getCategoryNames = () => {
+    if (!product.categoryIds || categories.length === 0) return [];
+    return product.categoryIds
+      .map(id => categories.find(cat => cat.id === id))
+      .filter(Boolean)
+      .map(cat => cat.name);
+  };
+
+  const categoryNames = getCategoryNames();
+  const primaryCategory = categoryNames[0];
 
   return (
     <div className="luxury-card group overflow-hidden">
@@ -34,6 +45,11 @@ const ProductCard = ({ product }) => {
       </div>
       
       <div className="p-6">
+        {primaryCategory && (
+          <div className="text-xs text-gray-500 font-semibold uppercase tracking-widest mb-2">
+            {primaryCategory}
+          </div>
+        )}
         <div className="text-xs text-secondary font-bold uppercase tracking-widest mb-2">{product.brand}</div>
         <h3 className="text-lg font-serif font-bold mb-2 group-hover:text-secondary transition-colors line-clamp-1">{product.name}</h3>
         <p className="text-gray-500 text-sm mb-4 line-clamp-2">{product.description}</p>
