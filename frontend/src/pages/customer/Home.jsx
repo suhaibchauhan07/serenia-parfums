@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import api from '../../services/api';
@@ -25,9 +25,8 @@ const slides = [
 
 const Home = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [featuredProducts, setFeaturedProducts] = useState([]);
-  const [categories, setCategories] = useState([]);
-  const navigate = useNavigate();
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -39,18 +38,19 @@ const Home = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [productsRes, categoriesRes] = await Promise.all([
-          api.get('/products'),
-          api.get('/categories')
-        ]);
-        setFeaturedProducts(productsRes.data.slice(0, 4));
-        setCategories(categoriesRes.data);
+        const res = await api.get('/products');
+        console.log('Home page products:', res.data);
+        setProducts(res.data);
       } catch (err) {
         console.error(err);
+      } finally {
+        setLoading(false);
       }
     };
     fetchData();
   }, []);
+
+  const featuredProducts = products.slice(0, 3); // First 3 products!
 
   return (
     <div className="overflow-hidden">
@@ -117,43 +117,6 @@ const Home = () => {
         </button>
       </section>
 
-      {/* Categories Section */}
-      {categories.length > 0 && (
-        <section className="py-24 bg-gray-50">
-          <div className="container mx-auto px-6">
-            <div className="text-center mb-16">
-              <span className="text-secondary font-medium tracking-widest uppercase text-sm">Explore by Category</span>
-              <h2 className="text-4xl font-serif font-bold mt-2">Our Collections</h2>
-              <div className="w-24 h-1 bg-secondary mx-auto mt-6"></div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {categories.map((category) => (
-                <motion.div
-                  key={category.id}
-                  whileHover={{ y: -8 }}
-                  className="group cursor-pointer"
-                  onClick={() => navigate(`/products?category=${category.id}`)}
-                >
-                  <div className="relative overflow-hidden rounded-sm shadow-lg aspect-[4/3]">
-                    <img 
-                      src={category.image} 
-                      alt={category.name} 
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent"></div>
-                    <div className="absolute bottom-0 left-0 right-0 p-8">
-                      <h3 className="text-2xl font-serif font-bold text-white mb-2">{category.name}</h3>
-                      <p className="text-gray-200 text-sm">{category.description}</p>
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
       {/* Featured Products */}
       <section className="py-24 bg-white">
         <div className="container mx-auto px-6">
@@ -163,13 +126,19 @@ const Home = () => {
             <div className="w-24 h-1 bg-secondary mx-auto mt-6"></div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {featuredProducts.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
+          {loading ? (
+            <div className="flex justify-center items-center py-20">
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-secondary"></div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+              {featuredProducts.map(product => (
+                <ProductCard key={product.id} product={product} />
+              ))}
+            </div>
+          )}
 
-          <div className="text-center mt-16">
+          <div className="text-center">
             <Link to="/products" className="text-primary font-bold border-b-2 border-primary hover:text-secondary hover:border-secondary transition-all pb-1 tracking-widest uppercase text-sm">
               View All Products
             </Link>
@@ -178,7 +147,7 @@ const Home = () => {
       </section>
 
       {/* About Teaser */}
-      <section className="py-24 bg-accent">
+      <section className="py-24 bg-gray-50">
         <div className="container mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
           <div className="relative">
             <img 
@@ -186,13 +155,12 @@ const Home = () => {
               alt="Perfume making" 
               className="rounded-sm shadow-xl"
             />
-            <div className="absolute -bottom-8 -right-8 w-48 h-48 bg-secondary -z-10"></div>
           </div>
           <div className="space-y-6">
             <span className="text-secondary font-medium tracking-widest uppercase text-sm">Our Heritage</span>
             <h2 className="text-4xl font-serif font-bold">The Art of Perfumery Since 1920</h2>
             <p className="text-gray-600 leading-relaxed">
-              Every bottle of Serenia Parfums tells a story of craftsmanship, dedication, and the pursuit of olfactory perfection. We source the finest ingredients from around the globe to create scents that are as unique as the individuals who wear them.
+              Every bottle of Serenia Parfums tells a story of craftsmanship, dedication, and the pursuit of olfactory perfection.
             </p>
             <Link to="/about" className="luxury-button inline-block">
               DISCOVER OUR STORY
