@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { User, Mail, Shield, Calendar, Package, Heart, Settings, X, CheckCircle, UserPlus, Check } from 'lucide-react';
+import { User, Mail, Shield, Calendar, Package, Heart, Settings, X, CheckCircle, UserPlus, Check, Lock } from 'lucide-react';
 import api from '../../services/api';
 
 const Profile = () => {
@@ -10,6 +10,11 @@ const Profile = () => {
   const [success, setSuccess] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [passwordForm, setPasswordForm] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' });
+  const [passwordLoading, setPasswordLoading] = useState(false);
+  const [passwordError, setPasswordError] = useState('');
+  const [passwordSuccess, setPasswordSuccess] = useState('');
 
   const handleSave = async () => {
     setLoading(true);
@@ -25,6 +30,31 @@ const Profile = () => {
       setError(err.response?.data?.message || 'Failed to update profile');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handlePasswordChange = async (e) => {
+    e.preventDefault();
+    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+      setPasswordError('Passwords do not match');
+      return;
+    }
+    setPasswordLoading(true);
+    setPasswordError('');
+    setPasswordSuccess('');
+    try {
+      await api.put('/auth/change-password', {
+        currentPassword: passwordForm.currentPassword,
+        newPassword: passwordForm.newPassword
+      });
+      setPasswordSuccess('Password changed successfully!');
+      setShowPasswordModal(false);
+      setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
+      setTimeout(() => setPasswordSuccess(''), 3000);
+    } catch (err) {
+      setPasswordError(err.response?.data?.message || 'Failed to change password');
+    } finally {
+      setPasswordLoading(false);
     }
   };
 
@@ -165,7 +195,7 @@ const Profile = () => {
                       <h4 className="font-bold text-sm">Password</h4>
                       <p className="text-xs text-gray-400">Last changed 2 days ago</p>
                     </div>
-                    <button className="text-xs font-bold text-secondary uppercase tracking-widest hover:underline">Change</button>
+                    <button className="text-xs font-bold text-secondary uppercase tracking-widest hover:underline" onClick={() => setShowPasswordModal(true)}>Change</button>
                   </div>
                   <div className="flex items-center justify-between p-4 bg-accent rounded-sm">
                     <div>
@@ -179,6 +209,63 @@ const Profile = () => {
             </div>
           </div>
         </div>
+
+        {/* Password Change Modal */}
+        {showPasswordModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-sm max-w-md w-full p-8">
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-xl font-serif font-bold">Change Password</h3>
+                <button onClick={() => { setShowPasswordModal(false); setPasswordError(''); setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' }); }} className="text-gray-400 hover:text-gray-600">
+                  <X size={20} />
+                </button>
+              </div>
+              {passwordSuccess && <div className="text-green-600 mb-4">{passwordSuccess}</div>}
+              {passwordError && <div className="text-red-600 mb-4">{passwordError}</div>}
+              <form onSubmit={handlePasswordChange} className="space-y-4">
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">Current Password</label>
+                  <input
+                    type="password"
+                    required
+                    value={passwordForm.currentPassword}
+                    onChange={(e) => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })}
+                    className="w-full border-b border-gray-200 py-2 focus:outline-none focus:border-secondary"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">New Password</label>
+                  <input
+                    type="password"
+                    required
+                    minLength={6}
+                    value={passwordForm.newPassword}
+                    onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
+                    className="w-full border-b border-gray-200 py-2 focus:outline-none focus:border-secondary"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">Confirm New Password</label>
+                  <input
+                    type="password"
+                    required
+                    minLength={6}
+                    value={passwordForm.confirmPassword}
+                    onChange={(e) => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
+                    className="w-full border-b border-gray-200 py-2 focus:outline-none focus:border-secondary"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  disabled={passwordLoading}
+                  className="luxury-button w-full py-3 text-xs mt-4"
+                >
+                  {passwordLoading ? 'Changing...' : 'Change Password'}
+                </button>
+              </form>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

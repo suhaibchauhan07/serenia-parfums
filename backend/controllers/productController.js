@@ -2,10 +2,28 @@ const supabase = require('../config/supabase');
 
 exports.getProducts = async (req, res) => {
   try {
-    const { data: products, error } = await supabase
+    let query = supabase
       .from('products')
       .select('*')
       .order('created_at', { ascending: false });
+
+    // Search functionality
+    if (req.query.search) {
+      const searchTerm = req.query.search.toLowerCase();
+      const { data: allProducts, error: allProductsError } = await query;
+      
+      if (allProductsError) throw allProductsError;
+      
+      const filteredProducts = allProducts.filter(product => 
+        product.name.toLowerCase().includes(searchTerm) ||
+        (product.description && product.description.toLowerCase().includes(searchTerm)) ||
+        (product.brand && product.brand.toLowerCase().includes(searchTerm))
+      );
+      
+      return res.json(filteredProducts);
+    }
+
+    const { data: products, error } = await query;
 
     if (error) throw error;
     res.json(products);

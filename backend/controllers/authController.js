@@ -91,3 +91,64 @@ exports.getMe = async (req, res) => {
     res.status(500).send('Server Error');
   }
 };
+
+exports.updateMe = async (req, res) => {
+  try {
+    const { name, email } = req.body;
+    
+    // Only update allowed fields
+    const updateData = {};
+    if (name !== undefined) updateData.name = name;
+    if (email !== undefined) updateData.email = email;
+
+    const { data: user, error } = await supabase
+      .from('users')
+      .update(updateData)
+      .eq('id', req.user.id)
+      .select('id, name, email, role')
+      .single();
+
+    if (error) throw error;
+    res.json(user);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ message: 'Failed to update profile' });
+  }
+};
+
+exports.changePassword = async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+
+    // Get user with password hash
+    const { data: user, error: userError } = await supabase
+      .from('users')
+      .select('*')
+      .eq('id', req.user.id)
+      .single();
+
+    if (userError) throw userError;
+
+    // Check current password
+    const isMatch = await bcrypt.compare(currentPassword, user.password_hash);
+    if (!isMatch) {
+      return res.status(400).json({ message: 'Current password is incorrect' });
+    }
+
+    // Hash new password
+    const salt = await bcrypt.genSalt(10);
+    const password_hash = await bcrypt.hash(newPassword, salt);
+
+    // Update password
+    const { error: updateError } = await supabase
+      .from('users')
+      .update({ password_hash })
+      .eq('id', req.user.id);
+
+    if (updateError) throw updateError;
+    res.json({ message: 'Password updated successfully' });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ message: 'Failed to update password' });
+  }
+};

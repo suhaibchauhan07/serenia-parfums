@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { ShoppingCart, User, LogOut, Search } from 'lucide-react';
+import { ShoppingCart, User, LogOut, Search, X } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
 
@@ -9,9 +9,20 @@ const Navbar = () => {
   const { cartItems } = useCart();
   const navigate = useNavigate();
   const location = useLocation();
+  const [showSearch, setShowSearch] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const isActive = (path) => {
     return location.pathname === path;
+  };
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/products?search=${encodeURIComponent(searchQuery.trim())}`);
+      setShowSearch(false);
+      setSearchQuery('');
+    }
   };
 
   return (
@@ -54,7 +65,7 @@ const Navbar = () => {
 
           {/* Icons */}
           <div className="flex items-center space-x-5">
-            <button className="text-gray-600 hover:text-primary transition-colors" onClick={() => navigate('/products')}>
+            <button className="text-gray-600 hover:text-primary transition-colors" onClick={() => setShowSearch(!showSearch)}>
               <Search size={20} />
             </button>
             
@@ -84,6 +95,37 @@ const Navbar = () => {
           </div>
         </div>
       </div>
+
+      {/* Search Modal */}
+      {showSearch && (
+        <div className="border-t border-gray-100 bg-white py-4">
+          <div className="container mx-auto px-4 md:px-6">
+          <form onSubmit={handleSearch} className="flex items-center space-x-4">
+            <input
+              type="text"
+              placeholder="Search for perfumes..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="flex-1 border-b border-gray-200 py-2 focus:outline-none focus:border-secondary"
+              autoFocus
+            />
+            <button
+              type="submit"
+              className="luxury-button text-xs py-2 px-4"
+            >
+              Search
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowSearch(false)}
+              className="text-gray-500 hover:text-gray-700"
+            >
+              <X size={20} />
+            </button>
+          </form>
+          </div>
+        </div>
+      )}
     </nav>
   );
 };
