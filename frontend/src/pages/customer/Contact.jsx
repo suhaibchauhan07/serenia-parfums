@@ -75,7 +75,7 @@ const Contact = () => {
                   </div>
                   <div>
                     <h4 className="font-bold uppercase tracking-widest text-sm mb-1">Boutique Address</h4>
-                    <p className="text-gray-500">123 Luxury Lane, Paris, France 75001</p>
+                    <p className="text-gray-500">123 Mataur Road, Sector 73, Mohali, India</p>
                   </div>
                 </div>
                 <div className="flex items-start">
@@ -84,7 +84,7 @@ const Contact = () => {
                   </div>
                   <div>
                     <h4 className="font-bold uppercase tracking-widest text-sm mb-1">Phone Number</h4>
-                    <p className="text-gray-500">+33 1 23 45 67 89</p>
+                    <p className="text-gray-500">+91 9634420786</p>
                   </div>
                 </div>
                 <div className="flex items-start">
