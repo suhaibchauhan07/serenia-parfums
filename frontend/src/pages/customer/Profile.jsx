@@ -24,7 +24,7 @@ const Profile = () => {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const res = await api.get('/api/orders');
+        const res = await api.get('/orders');
         setOrders(res.data);
       } catch (err) {
         console.error(err);
@@ -40,7 +40,7 @@ const Profile = () => {
     setError('');
     setSuccess('');
     try {
-      const res = await api.put('/api/auth/me', editForm);
+      const res = await api.put('/auth/me', editForm);
       updateUser(res.data);
       setSuccess('Profile updated successfully!');
       setIsEditing(false);
@@ -62,7 +62,7 @@ const Profile = () => {
     setPasswordError('');
     setPasswordSuccess('');
     try {
-      await api.put('/api/auth/change-password', {
+      await api.put('/auth/change-password', {
         currentPassword: passwordForm.currentPassword,
         newPassword: passwordForm.newPassword
       });
@@ -298,7 +298,7 @@ const Profile = () => {
                   <X size={20} />
                 </button>
               </div>
-              {passwordSuccess && <div className="text-green-600 mb-4">{passwordSuccess}</div>
+              {passwordSuccess }&& <div className="text-green-600 mb-4">{passwordSuccess}</div>
               {passwordError && <div className="text-red-600 mb-4">{passwordError}</div>}
               <form onSubmit={handlePasswordChange} className="space-y-4">
                 <div>

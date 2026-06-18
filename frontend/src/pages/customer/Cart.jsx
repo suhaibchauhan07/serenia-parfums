@@ -18,7 +18,7 @@ const Cart = () => {
     setLoading(true);
     setError('');
     try {
-      const res = await api.post('/api/orders', { payment_method: paymentMethod });
+      const res = await api.post('/orders', { payment_method: paymentMethod });
       await fetchCart();
       setShowPaymentModal(false);
       navigate('/profile');
