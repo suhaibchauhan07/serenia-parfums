@@ -75,7 +75,7 @@ export const CartProvider = ({ children }) => {
   }, [cartItems]);
 
   return (
-    <CartContext.Provider value={{ cartItems, loading, addToCart, removeFromCart, updateQuantity, cartTotal, isProductInCart }}>
+    <CartContext.Provider value={{ cartItems, loading, addToCart, removeFromCart, updateQuantity, cartTotal, isProductInCart, fetchCart }}>
       {children}
     </CartContext.Provider>
   );
