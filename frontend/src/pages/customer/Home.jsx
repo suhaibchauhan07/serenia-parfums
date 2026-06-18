@@ -158,7 +158,7 @@ const Home = () => {
           </div>
           <div className="space-y-6">
             <span className="text-secondary font-medium tracking-widest uppercase text-sm">Our Heritage</span>
-            <h2 className="text-4xl font-serif font-bold">The Art of Perfumery Since 1920</h2>
+            <h2 className="text-4xl font-serif font-bold">The Art of Perfumery Since 2000</h2>
             <p className="text-gray-600 leading-relaxed">
               Every bottle of Serenia Parfums tells a story of craftsmanship, dedication, and the pursuit of olfactory perfection.
             </p>

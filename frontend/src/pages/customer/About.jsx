@@ -25,7 +25,7 @@ const About = () => {
               </p>
               <div className="grid grid-cols-2 gap-8 pt-6">
                 <div>
-                  <h4 className="text-3xl font-serif font-bold text-secondary">100+</h4>
+                  <h4 className="text-3xl font-serif font-bold text-secondary">25+</h4>
                   <p className="text-xs font-bold uppercase tracking-widest text-gray-400 mt-2">Years of Heritage</p>
                 </div>
                 <div>

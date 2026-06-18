@@ -1,7 +1,7 @@
 import React from 'react';
 import { Outlet, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { LayoutDashboard, ShoppingBag, PlusCircle, LogOut, Menu, Tag } from 'lucide-react';
+import { LayoutDashboard, ShoppingBag, PlusCircle, LogOut, Menu } from 'lucide-react';
 
 const AdminLayout = () => {
   const { logout } = useAuth();
@@ -27,10 +27,6 @@ const AdminLayout = () => {
           <Link to="/admin/products" className="flex items-center px-6 py-4 hover:bg-gray-800 transition-colors">
             <ShoppingBag className="mr-3" size={20} />
             Products
-          </Link>
-          <Link to="/admin/categories" className="flex items-center px-6 py-4 hover:bg-gray-800 transition-colors">
-            <Tag className="mr-3" size={20} />
-            Categories
           </Link>
           <Link to="/admin/add-product" className="flex items-center px-6 py-4 hover:bg-gray-800 transition-colors">
             <PlusCircle className="mr-3" size={20} />

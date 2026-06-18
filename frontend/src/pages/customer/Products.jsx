@@ -2,13 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import api from '../../services/api';
 import ProductCard from '../../components/customer/ProductCard';
-
 const Products = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchParams] = useSearchParams();
   const searchQuery = searchParams.get('search');
-
+-
   useEffect(() => {
     const fetchProducts = async () => {
       try {

@@ -21,7 +21,7 @@ import AdminDashboard from './pages/admin/Dashboard';
 import AdminProducts from './pages/admin/Products';
 import AdminAddProduct from './pages/admin/AddProduct';
 import AdminEditProduct from './pages/admin/EditProduct';
-import AdminCategories from './pages/admin/Categories';
+
 
 // Layouts
 import CustomerLayout from './layouts/CustomerLayout';
@@ -64,7 +64,6 @@ function App() {
               <Route path="products" element={<AdminProducts />} />
               <Route path="add-product" element={<AdminAddProduct />} />
               <Route path="edit-product/:id" element={<AdminEditProduct />} />
-              <Route path="categories" element={<AdminCategories />} />
             </Route>
 
             <Route path="*" element={<Navigate to="/" />} />

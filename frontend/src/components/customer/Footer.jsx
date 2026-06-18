@@ -43,11 +43,11 @@ const Footer = () => {
             <ul className="space-y-3 text-sm text-gray-400">
               <li className="flex items-center">
                 <MapPin size={16} className="mr-3 text-secondary" />
-                123 Luxury Lane, Paris, France
+                123 Mataur Road, Sector 73, Mohali, India
               </li>
               <li className="flex items-center">
                 <Phone size={16} className="mr-3 text-secondary" />
-                +33 1 23 45 67 89
+                +91 9634420786
               </li>
               <li className="flex items-center">
                 <Mail size={16} className="mr-3 text-secondary" />
