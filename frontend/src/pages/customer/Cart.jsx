@@ -38,52 +38,57 @@ const Cart = () => {
         <div className="flex flex-col lg:flex-row gap-12">
           {/* Cart Items */}
           <div className="flex-grow space-y-4">
-            {cartItems.map((item) => (
-              <div key={item.id} className="bg-white p-6 rounded-sm shadow-sm flex flex-col sm:flex-row items-center gap-6">
-                <div className="w-24 h-32 bg-gray-100 rounded-sm overflow-hidden flex-shrink-0">
-                  <img 
-                    src={item.products.image_url || 'https://via.placeholder.com/100x130'} 
-                    alt={item.products.name} 
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                
-                <div className="flex-grow text-center sm:text-left">
-                  <div className="text-xs text-secondary font-bold uppercase tracking-widest mb-1">{item.products.brand}</div>
-                  <h3 className="text-lg font-serif font-bold mb-1">{item.products.name}</h3>
-                  <p className="text-gray-400 text-sm mb-2">{formatCurrency(item.products.price)}</p>
-                </div>
-
-                <div className="flex items-center space-x-4">
-                  <div className="flex items-center border border-gray-200">
-                    <button 
-                      onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                      className="p-2 hover:bg-gray-100 transition-colors"
-                    >
-                      <Minus size={16} />
-                    </button>
-                    <span className="w-10 text-center font-medium">{item.quantity}</span>
-                    <button 
-                      onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                      className="p-2 hover:bg-gray-100 transition-colors"
-                    >
-                      <Plus size={16} />
-                    </button>
+            {cartItems.map((item) => {
+              const price = Number(item.products.price);
+              const quantity = Number(item.quantity);
+              const itemTotal = price * quantity;
+              return (
+                <div key={item.id} className="bg-white p-6 rounded-sm shadow-sm flex flex-col sm:flex-row items-center gap-6">
+                  <div className="w-24 h-32 bg-gray-100 rounded-sm overflow-hidden flex-shrink-0">
+                    <img 
+                      src={item.products.image_url || 'https://via.placeholder.com/100x130'} 
+                      alt={item.products.name} 
+                      className="w-full h-full object-cover"
+                    />
                   </div>
                   
-                  <button 
-                    onClick={() => removeFromCart(item.id)}
-                    className="text-gray-400 hover:text-red-500 transition-colors"
-                  >
-                    <Trash2 size={20} />
-                  </button>
-                </div>
+                  <div className="flex-grow text-center sm:text-left">
+                    <div className="text-xs text-secondary font-bold uppercase tracking-widest mb-1">{item.products.brand}</div>
+                    <h3 className="text-lg font-serif font-bold mb-1">{item.products.name}</h3>
+                    <p className="text-gray-400 text-sm mb-2">{formatCurrency(price)}</p>
+                  </div>
 
-                <div className="w-24 text-right font-bold">
-                  {formatCurrency(item.products.price * item.quantity)}
+                  <div className="flex items-center space-x-4">
+                    <div className="flex items-center border border-gray-200">
+                      <button 
+                        onClick={() => updateQuantity(item.id, quantity - 1)}
+                        className="p-2 hover:bg-gray-100 transition-colors"
+                      >
+                        <Minus size={16} />
+                      </button>
+                      <span className="w-10 text-center font-medium">{quantity}</span>
+                      <button 
+                        onClick={() => updateQuantity(item.id, quantity + 1)}
+                        className="p-2 hover:bg-gray-100 transition-colors"
+                      >
+                        <Plus size={16} />
+                      </button>
+                    </div>
+                    
+                    <button 
+                      onClick={() => removeFromCart(item.id)}
+                      className="text-gray-400 hover:text-red-500 transition-colors"
+                    >
+                      <Trash2 size={20} />
+                    </button>
+                  </div>
+
+                  <div className="w-24 text-right font-bold">
+                    {formatCurrency(itemTotal)}
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           {/* Summary */}

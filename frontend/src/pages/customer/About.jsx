@@ -18,10 +18,10 @@ const About = () => {
             <div className="space-y-8">
               <h2 className="text-4xl font-serif font-bold">A Legacy of Luxury</h2>
               <p className="text-gray-600 leading-relaxed text-lg">
-                Founded in 1920 in the heart of Grasse, France, Serenia Parfums has spent over a century perfecting the art of fine fragrance. What began as a small family atelier has grown into a world-renowned house of luxury, known for our uncompromising commitment to quality and artistic expression.
+                Serenia Parfums was founded with a singular vision: to create fragrances that transcend time and evoke profound emotions. Each scent is meticulously crafted by our master perfumers using only the finest, ethically-sourced ingredients from around the world.
               </p>
               <p className="text-gray-600 leading-relaxed text-lg">
-                We believe that a fragrance is more than just a scent; it is an invisible accessory, a memory captured in a bottle, and a statement of identity.
+                We believe that a fragrance is more than just a scent—it is an invisible accessory that tells your story, a memory captured in a bottle, and a statement of your unique identity.
               </p>
               <div className="grid grid-cols-2 gap-8 pt-6">
                 <div>
@@ -36,9 +36,9 @@ const About = () => {
             </div>
             <div className="relative">
               <img 
-                src="https://images.unsplash.com/photo-1615485290382-441e4d019cb0?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80" 
+                src="https://images.unsplash.com/photo-1513364776144-60967b0f800f?auto=format&fit=crop&q=80&w=1000" 
                 alt="Our workshop" 
-                className="rounded-sm shadow-2xl"
+                className="rounded-sm shadow-2xl w-full"
               />
             </div>
           </div>

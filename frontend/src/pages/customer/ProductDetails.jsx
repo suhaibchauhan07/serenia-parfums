@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ShoppingCart, ArrowLeft, ShieldCheck, Truck, RefreshCw } from 'lucide-react';
+import { ShoppingCart, ArrowLeft, ShieldCheck, Truck, RefreshCw, Check } from 'lucide-react';
 import api from '../../services/api';
 import { useCart } from '../../context/CartContext';
 import { formatCurrency } from '../../utils/currency';
@@ -10,7 +10,8 @@ const ProductDetails = () => {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
-  const { addToCart } = useCart();
+  const { addToCart, isProductInCart } = useCart();
+  const inCart = isProductInCart(id);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -74,9 +75,17 @@ const ProductDetails = () => {
               </div>
               <button 
                 onClick={() => addToCart(product.id, quantity)}
-                className="luxury-button flex-grow flex items-center justify-center py-4"
+                className={`flex-grow flex items-center justify-center py-4 font-bold uppercase tracking-widest ${
+                  inCart 
+                    ? 'bg-green-600 text-white' 
+                    : 'luxury-button'
+                }`}
               >
-                <ShoppingCart size={20} className="mr-2" /> ADD TO CART
+                {inCart ? (
+                  <><Check size={20} className="mr-2" /> IN CART</>
+                ) : (
+                  <><ShoppingCart size={20} className="mr-2" /> ADD TO CART</>
+                )}
               </button>
             </div>
 

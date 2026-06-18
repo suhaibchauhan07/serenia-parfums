@@ -1,11 +1,12 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ShoppingCart, Eye } from 'lucide-react';
+import { ShoppingCart, Eye, Check } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
 import { formatCurrency } from '../../utils/currency';
 
 const ProductCard = ({ product }) => {
-  const { addToCart } = useCart();
+  const { addToCart, isProductInCart } = useCart();
+  const inCart = isProductInCart(product.id);
 
   return (
     <div className="luxury-card group overflow-hidden">
@@ -18,10 +19,12 @@ const ProductCard = ({ product }) => {
         <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100 space-x-4">
           <button 
             onClick={() => addToCart(product.id)}
-            className="p-3 bg-white text-primary rounded-full hover:bg-secondary hover:text-white transition-colors shadow-lg"
-            title="Add to Cart"
+            className={`p-3 rounded-full transition-colors shadow-lg ${
+              inCart ? 'bg-green-600 text-white' : 'bg-white text-primary hover:bg-secondary hover:text-white'
+            }`}
+            title={inCart ? "In Cart" : "Add to Cart"}
           >
-            <ShoppingCart size={20} />
+            {inCart ? <Check size={20} /> : <ShoppingCart size={20} />}
           </button>
           <Link 
             to={`/products/${product.id}`}
@@ -41,9 +44,13 @@ const ProductCard = ({ product }) => {
           <span className="text-xl font-bold">{formatCurrency(product.price)}</span>
           <button 
             onClick={() => addToCart(product.id)}
-            className="text-xs font-bold uppercase tracking-tighter border-b border-primary hover:text-secondary hover:border-secondary transition-all"
+            className={`text-xs font-bold uppercase tracking-tighter border-b transition-all ${
+              inCart 
+                ? 'border-green-600 text-green-600' 
+                : 'border-primary hover:text-secondary hover:border-secondary'
+            }`}
           >
-            Add to Cart
+            {inCart ? "In Cart" : "Add to Cart"}
           </button>
         </div>
       </div>
